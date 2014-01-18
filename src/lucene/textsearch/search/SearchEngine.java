@@ -3,6 +3,8 @@ package lucene.textsearch.search;
 import java.io.File;
 import java.io.IOException;
 
+import lucene.textsearch.business.PDFIndexItem;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -12,6 +14,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 public class SearchEngine {
@@ -22,12 +25,12 @@ public class SearchEngine {
 
 	/** Creates a new instance of SearchEngine */
 	public SearchEngine(Index index) throws IOException {
-		reader = IndexReader.open(index.getIndexWriter(), true);
+		reader = IndexReader.open(FSDirectory.open(new File("index-directory")));
 		searcher = new IndexSearcher(reader);
 		// the "title" arg specifies the default field to use
 	    // when no field is explicitly specified in the query.
-		parser = new QueryParser(Version.LUCENE_40, "title",
-				new StandardAnalyzer(Version.LUCENE_40));
+		parser = new QueryParser(Version.LUCENE_46, PDFIndexItem.CONTENT,
+				new StandardAnalyzer(Version.LUCENE_46));
 	}
 
 	public TopDocs performSearch(String queryString) throws IOException,

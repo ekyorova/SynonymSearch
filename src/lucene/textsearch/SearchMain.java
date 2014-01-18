@@ -18,9 +18,13 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.util.PDFTextStripper;
 
+import java.io.File;
 import java.io.IOException;
 
+import lucene.textsearch.business.PDFIndexItem;
 import lucene.textsearch.search.Index;
 import lucene.textsearch.search.SearchEngine;
 
@@ -29,15 +33,18 @@ public class SearchMain {
     // 0. Specify the analyzer for tokenizing text.
     //    The same analyzer should be used for indexing and searching
 
-    Index index = new Index();
+    Index indexer = new Index();
+    File pdfFile = new File("src/resources/SamplePDF.pdf");
+    PDFIndexItem pdfIndexItem = extractText(pdfFile);
 
-    index.rebuildIndexes();
+    indexer.buildIndexes(pdfIndexItem);
+    //indexer.closeIndexWriter();
     
     // 2. query
-    String querystr = "lucene";
+    String querystr = "Hello";
 
     // 3. search
-    SearchEngine searchEngine = new SearchEngine(index);
+    SearchEngine searchEngine = new SearchEngine(indexer);
     ScoreDoc[] hits = searchEngine.performSearch(querystr).scoreDocs;
     
     // 4. display results
@@ -50,7 +57,14 @@ public class SearchMain {
 
     // reader can only be closed when there
     // is no need to access the documents any more.
-    index.closeIndexWriter();
+    indexer.closeIndexWriter();
     searchEngine.close();
+  }
+  
+  public static PDFIndexItem extractText(File file) throws IOException {
+      PDDocument doc = PDDocument.load(file);
+      String content = new PDFTextStripper().getText(doc);
+      doc.close();
+      return new PDFIndexItem((long)file.getName().hashCode(), file.getName(), content);
   }
 }
