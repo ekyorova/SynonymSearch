@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+        <modelVersion>4.0.0</modelVersion>
+        <groupId>synonymSearch</groupId>
+        <artifactId>synonymSearch</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <name>synonymSearch</name>
+        <packaging>pom</packaging>
+        <description>synonymSearch</description>
+        
+        <properties>
+                <maven.compiler.version>2.3.1</maven.compiler.version>
+                <java.compiler.level>1.7</java.compiler.level>
+        </properties>
+        
+        <dependencyManagement>
+                <dependencies>
+                        <dependency>
+						  <groupId>org.apache.httpcomponents</groupId>
+						  <artifactId>httpclient</artifactId>
+						  <version>4.3.1</version>
+						</dependency>
+                </dependencies>
+        </dependencyManagement>
+        
+        <!-- Common settings - compiler, etc -->
+        <build>
+                <plugins>
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <version>${maven.compiler.version}</version>
+                                <configuration>
+                                        <source>${java.compiler.level}</source>
+                                        <target>${java.compiler.level}</target>
+                                </configuration>
+                        </plugin>
+                </plugins>        
+        </build>
+</project>

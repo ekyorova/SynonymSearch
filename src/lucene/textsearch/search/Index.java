@@ -13,9 +13,7 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 
 
@@ -31,7 +29,7 @@ public class Index {
 		if (indexWriter == null) {
 			indexWriter = new IndexWriter(FSDirectory.open(new File(
 					"index-directory")), new IndexWriterConfig(
-					Version.LUCENE_40, new StandardAnalyzer(Version.LUCENE_40)));
+					Version.LUCENE_46, new StandardAnalyzer(Version.LUCENE_46)));
 		}
 		return indexWriter;
 	}
