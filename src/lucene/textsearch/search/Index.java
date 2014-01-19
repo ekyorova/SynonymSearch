@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import lucene.textsearch.business.PDFIndexItem;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -29,7 +29,7 @@ public class Index {
 		if (indexWriter == null) {
 			indexWriter = new IndexWriter(FSDirectory.open(new File(
 					"index-directory")), new IndexWriterConfig(
-					Version.LUCENE_46, new StandardAnalyzer(Version.LUCENE_46)));
+					Version.LUCENE_46, new EnglishAnalyzer(Version.LUCENE_46)));
 		}
 		return indexWriter;
 	}
