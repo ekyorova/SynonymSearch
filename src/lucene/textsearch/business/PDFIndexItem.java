@@ -4,10 +4,12 @@ public class PDFIndexItem {
 	private Long id;
     private String title;
     private String content;
+    private String pageNumber;
 
     public static final String ID = "id";
     public static final String TITLE = "title";
     public static final String CONTENT = "content";
+	public static final String PAGENUMBER = "pageNumber";
 
     public PDFIndexItem(Long id, String title, String content) {
         this.id = id;
@@ -35,6 +37,14 @@ public class PDFIndexItem {
                 ", content='" + content + '\'' +
                 '}';
     }
+
+	public String getPageNumber() {
+		return pageNumber;
+	}
+
+	public void setPageNumber(String pageNumber) {
+		this.pageNumber = pageNumber;
+	}
 
 
 }

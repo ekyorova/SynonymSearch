@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -58,10 +57,15 @@ public class MongodbConnector {
 		while (cursor.hasNext()) {
 		    BasicDBObject obj = (BasicDBObject) cursor.next();
 		    if(obj.getString(querystr)!= null){
-		    	result.addAll((Collection<? extends String>) obj.get(querystr));
+		    	result.addAll(extracted(querystr, obj));
 		    }
 		}
 		return result;
+	}
+
+	private Collection<? extends String> extracted(String querystr,
+			BasicDBObject obj) {
+		return (Collection<? extends String>) obj.get(querystr);
 	}
 	
 	private boolean isAllNulls(Iterable<?> array) {

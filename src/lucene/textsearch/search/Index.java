@@ -16,7 +16,6 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
-
 public class Index {
 
 	/** Creates a new instance of Indexer */
@@ -41,7 +40,6 @@ public class Index {
 	}
 
 	public void indexDocuments(PDFIndexItem indexItem) throws IOException {
-		System.out.println("Indexing documents.. ");
 		IndexWriter writer = getIndexWriter();
 		writer.deleteDocuments(new Term(PDFIndexItem.ID, indexItem.getId()
 				.toString()));
@@ -59,27 +57,9 @@ public class Index {
 		writer.addDocument(doc);
 
 	}
-
-	public void addDoc(IndexWriter w, String title, String isbn)
-			throws IOException {
-		Document doc = new Document();
-		doc.add(new TextField("title", title, Field.Store.YES));
-		// use a string field for isbn because we don't want it tokenized
-		doc.add(new StringField("isbn", isbn, Field.Store.YES));
-		w.addDocument(doc);
-	}
-
+	
 	public void buildIndexes(PDFIndexItem indexItem) throws IOException {
-		//
-		// Erase existing index
-		//
 		getIndexWriter();
-		//
-		// Index all Accommodation entries
-		//
 		indexDocuments(indexItem);
-		//
-		// Don't forget to close the index writer when done
-		//
 	}
 }

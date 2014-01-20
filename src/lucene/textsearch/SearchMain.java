@@ -19,9 +19,7 @@ import lucene.textsearch.business.PDFIndexItem;
 import lucene.textsearch.search.Index;
 import lucene.textsearch.search.SearchEngine;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.search.ScoreDoc;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
@@ -40,7 +38,7 @@ public class SearchMain {
 
 		InputStreamReader in = new InputStreamReader(System.in);
 		BufferedReader keyboard = new BufferedReader(in);
-		System.out.println("Search:");
+		System.out.println("Search: ");
 		String querystr = keyboard.readLine();
 
 		MongodbConnector con = new MongodbConnector();
@@ -53,26 +51,21 @@ public class SearchMain {
 			String[] der = connectToDict(querystr);
 			if (der != null) {
 				derivatives = new ArrayList<String>(Arrays.asList(der));
-				derivatives.add(querystr);
 			}
+			derivatives.add(querystr);
 			String root = querystr;
 			List<String> list = derivatives;
 			con.insertObject(root, list);
 		}
 
-		System.out.println(derivatives);		
+		System.out.println("Found derivatives/synonyms:");
+		for (String derivative : derivatives) {
+			System.out.print(" " + derivative);
+		}
 
 		SearchEngine searchEngine = new SearchEngine();
-		List<ScoreDoc[]> scoreList = searchEngine.performSearch(derivatives);
+		searchEngine.performSearch(derivatives);
 
-		for (ScoreDoc[] hits : scoreList) {
-			System.out.println("Found " + hits.length + " hits.");
-			for (int i = 0; i < hits.length; ++i) {
-				int docId = hits[i].doc;
-				Document d = searchEngine.getSearcher().doc(docId);
-				System.out.println((i + 1) + " " + d.get(PDFIndexItem.TITLE));
-			}
-		}
 		searchEngine.close();
 
 	}
@@ -97,6 +90,7 @@ public class SearchMain {
 			pageInfo.trim();
 			pageInfo = pageInfo.replace("\n", "").replace("\r", "");
 			allSynonyms = getDerivatives(pageInfo);
+			// allSynonyms = getSynonyms(pageInfo);
 		}
 
 		return (String[]) ((allSynonyms == null) ? null : allSynonyms);
@@ -106,6 +100,20 @@ public class SearchMain {
 		boolean flag = false;
 		Pattern pattern = Pattern
 				.compile("(?i)(<a id=\"Derived_terms\" name=\"Derived_terms\"></a><h4>Derived terms</h4><ul><li>)(.+?)(</li></ul><a id=)");
+		Matcher matcher = pattern.matcher(pageInfo);
+		String splitted = null;
+		if (matcher.find()) {
+			splitted = matcher.group(2);
+			if (splitted != null)
+				flag = true;
+		}
+		return (flag ? splitted.split("</li><li>") : null);
+	}
+
+	private static String[] getSynonyms(String pageInfo) {
+		boolean flag = false;
+		Pattern pattern = Pattern
+				.compile("(?i)(<a id=\"Synonyms\" name=\"Synonyms\"></a><h4>Synonyms</h4><ul><li>)(.+?)(</li></ul><a id=)");
 		Matcher matcher = pattern.matcher(pageInfo);
 		String splitted = null;
 		if (matcher.find()) {
