@@ -20,13 +20,13 @@ import lucene.textsearch.search.Index;
 import lucene.textsearch.search.SearchEngine;
 
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
 public class SearchMain {
 	public static void main(String[] args) throws IOException, ParseException {
 
-		// The same analyzer should be used for indexing and searching
 		File folder = new File("src/resources");
 		File[] listOfFiles = folder.listFiles();
 		for (File pdfFile : listOfFiles) {
@@ -58,18 +58,25 @@ public class SearchMain {
 			con.insertObject(root, list);
 		}
 
-		System.out.println("Found derivatives/synonyms:");
+		System.out.println("Found derivatives:");
 		for (String derivative : derivatives) {
 			System.out.print(" " + derivative);
 		}
 
+		System.out.println();
+		
 		SearchEngine searchEngine = new SearchEngine();
-		searchEngine.performSearch(derivatives);
+		try {
+			searchEngine.performSearch(derivatives);
+		} catch (InvalidTokenOffsetsException e) {
+			System.out.println("Search was not performed!");
+			e.printStackTrace();
+		}
 
 		searchEngine.close();
 
 	}
-
+	
 	public static PDFIndexItem extractText(File file) throws IOException {
 		PDDocument doc = PDDocument.load(file);
 		String content = new PDFTextStripper().getText(doc);
@@ -90,7 +97,6 @@ public class SearchMain {
 			pageInfo.trim();
 			pageInfo = pageInfo.replace("\n", "").replace("\r", "");
 			allSynonyms = getDerivatives(pageInfo);
-			// allSynonyms = getSynonyms(pageInfo);
 		}
 
 		return (String[]) ((allSynonyms == null) ? null : allSynonyms);
@@ -104,24 +110,21 @@ public class SearchMain {
 		String splitted = null;
 		if (matcher.find()) {
 			splitted = matcher.group(2);
+			if (!splitted.contains(" ")){
 			if (splitted != null)
 				flag = true;
+		}
 		}
 		return (flag ? splitted.split("</li><li>") : null);
 	}
 
-	private static String[] getSynonyms(String pageInfo) {
-		boolean flag = false;
-		Pattern pattern = Pattern
-				.compile("(?i)(<a id=\"Synonyms\" name=\"Synonyms\"></a><h4>Synonyms</h4><ul><li>)(.+?)(</li></ul><a id=)");
-		Matcher matcher = pattern.matcher(pageInfo);
-		String splitted = null;
-		if (matcher.find()) {
-			splitted = matcher.group(2);
-			if (splitted != null)
-				flag = true;
-		}
-		return (flag ? splitted.split("</li><li>") : null);
-	}
+	/*
+	 * private static String[] getSynonyms(String pageInfo) { boolean flag =
+	 * false; Pattern pattern = Pattern .compile(
+	 * "(?i)(<a id=\"Synonyms\" name=\"Synonyms\"></a><h4>Synonyms</h4><ul><li>)(.+?)(</li></ul><a id=)"
+	 * ); Matcher matcher = pattern.matcher(pageInfo); String splitted = null;
+	 * if (matcher.find()) { splitted = matcher.group(2); if (splitted != null)
+	 * flag = true; } return (flag ? splitted.split("</li><li>") : null); }
+	 */
 
 }

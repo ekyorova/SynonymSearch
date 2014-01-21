@@ -38,8 +38,8 @@ public class MongodbConnector {
 	public DBObject getObject() {
 		return getCollection().findOne();
 	}
-	
-	public void insertObject(String key, List<String> searchWords){
+
+	public void insertObject(String key, List<String> searchWords) {
 		BasicDBObject doc = new BasicDBObject(key, searchWords);
 		getCollection().insert(doc);
 	}
@@ -53,12 +53,12 @@ public class MongodbConnector {
 		BasicDBObject query = new BasicDBObject();
 		BasicDBObject field = new BasicDBObject();
 		field.put(querystr, 1);
-		DBCursor cursor = getCollection().find(query,field);
+		DBCursor cursor = getCollection().find(query, field);
 		while (cursor.hasNext()) {
-		    BasicDBObject obj = (BasicDBObject) cursor.next();
-		    if(obj.getString(querystr)!= null){
-		    	result.addAll(extracted(querystr, obj));
-		    }
+			BasicDBObject obj = (BasicDBObject) cursor.next();
+			if (obj.getString(querystr) != null) {
+				result.addAll(extracted(querystr, obj));
+			}
 		}
 		return result;
 	}
@@ -67,11 +67,12 @@ public class MongodbConnector {
 			BasicDBObject obj) {
 		return (Collection<? extends String>) obj.get(querystr);
 	}
-	
+
 	private boolean isAllNulls(Iterable<?> array) {
-	    for (Object element : array)
-	        if (element != null) return false;
-	    return true;
+		for (Object element : array)
+			if (element != null)
+				return false;
+		return true;
 	}
 
 }

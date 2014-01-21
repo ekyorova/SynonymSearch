@@ -6,10 +6,13 @@ import java.io.IOException;
 import lucene.textsearch.business.PDFIndexItem;
 
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.FieldInfo;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
@@ -18,7 +21,6 @@ import org.apache.lucene.util.Version;
 
 public class Index {
 
-	/** Creates a new instance of Indexer */
 	public Index() {
 	}
 
@@ -28,7 +30,7 @@ public class Index {
 		if (indexWriter == null) {
 			indexWriter = new IndexWriter(FSDirectory.open(new File(
 					"index-directory")), new IndexWriterConfig(
-					Version.LUCENE_46, new EnglishAnalyzer(Version.LUCENE_46)));
+					Version.LUCENE_46, new StandardAnalyzer(Version.LUCENE_46)));
 		}
 		return indexWriter;
 	}
@@ -50,14 +52,20 @@ public class Index {
 				Field.Store.YES));
 		doc.add(new TextField(PDFIndexItem.TITLE, indexItem.getTitle(),
 				Field.Store.YES));
+		FieldType type = new FieldType();
+		type.setIndexed(true);
+		type.setIndexOptions(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+		type.setStored(true);
+		type.setStoreTermVectors(true);
+		type.setTokenized(true);
+		type.setStoreTermVectorOffsets(true);
 		doc.add(new TextField(PDFIndexItem.CONTENT, indexItem.getContent(),
 				Field.Store.YES));
-
-		// add the document to the index
+		doc.add(new Field(PDFIndexItem.NCONTENT, indexItem.getContent(), type));
 		writer.addDocument(doc);
 
 	}
-	
+
 	public void buildIndexes(PDFIndexItem indexItem) throws IOException {
 		getIndexWriter();
 		indexDocuments(indexItem);
